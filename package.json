@@ -11,6 +11,7 @@
     "connect-assets": "*",
     "mongoose": "~3.8.8",
     "nodemon": "~1.0.15",
-    "express-validator": "~1.0.1"
+    "express-validator": "~1.0.1",
+    "socket.io": "~0.9.16"
   }
 }
