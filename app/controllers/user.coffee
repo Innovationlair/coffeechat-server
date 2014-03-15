@@ -1,33 +1,47 @@
 mongoose = require 'mongoose'
 User = mongoose.model 'User'
+uuid = require('node-uuid')
+path = require('path')
+fs = require('fs')
+consts = require('../../config/consts')
+helpers = require('../helpers')
 
-exports.index = (req, res) ->
-  User.all (err, users) ->
-    res.send err if err
-    res.json users
+clean_avatar = (avatar, token) ->
+  if avatar
+    tempPath = avatar.path
+    ext = path.extname(avatar.name)
+    filename = "avatar_#{token}#{ext}"
+    relative_path = path.join(consts.UPLOADS_PATH, "#{filename}")
+    targetPath = path.resolve(relative_path)
 
-exports.create = (req, res) ->
-  User.create req.body, (err, user) ->
-    res.send err if err
-    res.json token: user._id
+    fs.rename tempPath, targetPath, (err) ->
+      next(err) if err
 
-exports.show = (req, res) ->
-  User.findById(req.params.id).exec (err, user) ->
+    avatar = relative_path
+  else
+    avatar = null
+
+  return avatar
+
+exports.create = (req, res, next) ->
+  name = req.body.name
+  token = uuid.v4()
+
+  params =
+    name: name
+    token: token
+    avatar: clean_avatar(req.files.avatar, token)
+
+  User.create params, (err, user) ->
     res.send err if err
-    return next new Error 'No user found' unless user
+    helpers.prepend_baseurl(req, 'avatar', user)
     res.json user
-  return
 
-exports.update = (req, res) ->
-  User.findByIdAndUpdate req.params.id, req.query, (err, user) ->
-    res.send err if err
-    return next new Error 'No user found' unless user
-    return res.json status: 'ok'
-  return
-
-exports.destroy = (req, res) ->
-  User.findOneAndRemove req.params.id, (err, user) ->
-    res.send err if err
-    return next new Error 'No user found' unless user
-    res.json status: 'ok'
-  return
+exports.update = (req, res, next) ->
+  params = {}
+  token = req.headers.authorization
+  params.name = req.body.name if req.body.name
+  params.avatar = clean_avatar(req.files.avatar, token) if req.files.avatar
+  req.user.update params, (err, user) ->
+    next(err) if err
+    res.send 200

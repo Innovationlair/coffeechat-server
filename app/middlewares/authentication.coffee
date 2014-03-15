@@ -2,14 +2,17 @@ User = require('../models/User')
 
 module.exports = ->
   return (req, res, next) ->
-    userId = req.headers.authorization
-    if userId
-      User.findById userId, (error, user) ->
+    token = req.headers.authorization
+    if token
+      User.findByToken token, (error, user) ->
         if not error
-          req.user = user
-          next()
+          if user
+            req.user = user
+            next()
+          else
+            res.send(400, "Invalid authentication token: #{token}")
         else
-          next(new Error('Invalid authentication token'))
+          next(error)
     else
       # Maybe raise Unauthorized???
-      next()
+      res.send(401, "Unauthorized request!")
