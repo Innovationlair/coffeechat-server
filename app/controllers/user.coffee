@@ -35,7 +35,7 @@ exports.create = (req, res, next) ->
   User.create params, (err, user) ->
     res.send err if err
     helpers.prepend_baseurl(req, 'avatar', user)
-    res.json user
+    res.json 201, user
 
 exports.update = (req, res, next) ->
   params = {}

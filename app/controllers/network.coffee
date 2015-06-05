@@ -13,6 +13,7 @@ exports.index = (req, res, next) ->
       res.json networks
 
 exports.create = (req, res, next) ->
+  console.log req.body
   req.checkBody('lat', 'Invalid latitude param').isFloat()
   req.checkBody('lon', 'Invalid latitude param').isFloat()
 
@@ -37,15 +38,15 @@ exports.create = (req, res, next) ->
   Network.findOrCreate params, (error, network, created) ->
     if error
       next 400, error
-    else if created
-      network.members.push(req.user)
+    else
+      network.members.addToSet(req.user)
       network.save (err) ->
         next(err) if err
         fetch_network network._id, (network) ->
-          res.json 201, network
-    else
-      fetch_network network._id, (network) ->
-        res.json 200, network
+          if created
+            res.json 201, network
+          else
+            res.json 200, network
 
 exports.show = (req, res, next) ->
   Network.findById(req.params.id)

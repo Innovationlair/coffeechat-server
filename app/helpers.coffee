@@ -4,7 +4,10 @@ prepend_baseurl = (req, attr, object) ->
   console.log objects
   for object in objects
     attribute = object[attr]
-    object[attr] = "#{baseURL}#{attribute}"
+    if attribute
+      object[attr] = "#{baseURL}#{attribute}"
+    else
+      object[attr] = attribute
 
 
 module.exports =

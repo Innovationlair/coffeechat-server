@@ -12,7 +12,7 @@ NetworkSchema.statics.findOrCreate = (params, callback) ->
     center:
       "type": "Point"
       "coordinates": params.location
-    maxDistance: 500
+    maxDistance: 10000
   query.exec (error, network) ->
     if not network
       Network.create params, (error, network) ->
