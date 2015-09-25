@@ -32,7 +32,6 @@ exports.create = (req, res, next) ->
       .populate(path: 'members', select: 'name avatar')
       .exec (err, network) ->
         next(err) if err
-        helpers.prepend_baseurl(req, 'avatar', network.members)
         callback(network) if callback
 
   Network.findOrCreate params, (error, network, created) ->

@@ -24,17 +24,18 @@ clean_avatar = (avatar, token) ->
   return avatar
 
 exports.create = (req, res, next) ->
+  console.log req.body
   name = req.body.name
+  avatar = req.body.avatar
   token = uuid.v4()
 
   params =
     name: name
     token: token
-    avatar: clean_avatar(req.files.avatar, token)
+    avatar: avatar
 
   User.create params, (err, user) ->
     res.send err if err
-    helpers.prepend_baseurl(req, 'avatar', user)
     res.json 201, user
 
 exports.update = (req, res, next) ->
