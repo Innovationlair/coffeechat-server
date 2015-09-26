@@ -45,8 +45,7 @@ io.sockets.on 'connection', (socket) ->
       socket.get 'senderId', (_, senderId) ->
         console.log "Message `#{msg.body}` sent from #{senderId} to #{msg.recipientId}"
         recipientSocket = clients[senderId]
-	    if (recipientSocket?)
-	      recipientSocket.broadcast.emit('message', message: msg.body, senderId: senderId)
+        recipientSocket.broadcast.emit('message', message: msg.body, senderId: senderId)
 
     socket.on "disconnect", (socket) ->
       socket.get 'senderId', (_, senderId) ->
